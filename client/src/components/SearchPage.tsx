@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom"
 import { Input } from "./ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Globe, MapPin, X } from "lucide-react";
@@ -9,14 +9,22 @@ import { AspectRatio } from "./ui/aspect-ratio";
 import HeroImage from "../assets/hero_pizza.png"
 import { Skeleton } from "./ui/skeleton";
 import { FilterPage } from "./FilterPage";
+import { useRestaurantStore } from "../store/useRestaurantStore";
 
 export const SearchPage = () => {
     const [searchQuery, setSearchQuery] = useState<string>("");
 
     const params = useParams();
 
+    const { searchRestaurant, appliedFilter, searchedRestaurant } = useRestaurantStore();
+
+
+    useEffect(() => {
+        searchRestaurant(params.text, searchQuery, appliedFilter);
+    }, [appliedFilter, params.text])
+
     return (
-        <div className="max-w-7xl mx-auto my-6 md:my-10">
+        <div className="w-full px-4 md:max-w-7xl mx-auto my-6 md:my-10">
             <div className="flex flex-col md:flex-row justify-between   gap-10">
                 <FilterPage />
 
@@ -28,13 +36,15 @@ export const SearchPage = () => {
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
-                        <Button className="bg-orange hover:bg-hoverOrange">Search</Button>
+                        <Button onClick={() =>
+                            searchRestaurant(params.text, searchQuery, appliedFilter)
+                        } className="bg-orange hover:bg-hoverOrange">Search</Button>
                     </div>
 
                     <div className="my-3">
                         <div className="flex flex-col md:flex-row gap-3 md:items-center  my-3 md:mb-6">
                             <h1 className="text-lg font-medium">(4) Search result found</h1>
-                            {["momo", "jilebi", "birayani"].map(
+                            {appliedFilter?.map(
                                 (selectedFilter: string, idx: number) => (
                                     <div
                                         key={idx}
@@ -58,11 +68,11 @@ export const SearchPage = () => {
 
                         <div className="grid md:grid-cols-3 gap-4">
                             {
-                                [1, 2, 3, 4].map((item: number, idx: number) => (
+                                searchedRestaurant?.map((restaurant: any, idx: number) => (
                                     <Card key={idx} className="bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300">
                                         <div className="relative">
                                             <AspectRatio ratio={16 / 6}>
-                                                <img src={HeroImage} alt="" className="h-full w-full object-cover" />
+                                                <img src={restaurant?.imageUrl} alt="" className="h-full w-full object-cover" />
                                             </AspectRatio>
                                             <div className="absolute top-2 left-2 bg-white dark:bg-gray-700 bg-opacity-75 rounded-lg px-3 py-1">
                                                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -72,13 +82,13 @@ export const SearchPage = () => {
                                         </div>
 
                                         <CardContent>
-                                            <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">Pizza Hunt</h1>
+                                            <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">   {restaurant.restaurantName}</h1>
 
                                             <div className="mt-2 gap-1 flex items-center text-gray-600 dark:text-gray-400">
                                                 <MapPin size={16} />
                                                 <p className="text-sm">
                                                     City:{" "}
-                                                    <span className="font-medium">Gorakhpur</span>
+                                                    <span className="font-medium">{restaurant.city}</span>
                                                 </p>
                                             </div>
 
@@ -87,13 +97,13 @@ export const SearchPage = () => {
                                                 <p className="text-sm">
                                                     Country:{" "}
                                                     <span className="font-medium">
-                                                        {"India"}
+                                                        {restaurant.country}
                                                     </span>
                                                 </p>
                                             </div>
 
                                             <div className="flex gap-2 mt-4 flex-wrap">
-                                                {["jalebi", "Pizza", "Egg"].map(
+                                                {restaurant?.cuisines.map(
                                                     (cuisine: string, idx: number) => (
                                                         <Badge
                                                             key={idx}
@@ -107,7 +117,7 @@ export const SearchPage = () => {
                                         </CardContent>
 
                                         <CardFooter className="py-3 border-t dark:border-t-gray-700 border-t-gray-100 text-white flex justify-end">
-                                            <Link to={`/restaurant/${123}`}>
+                                            <Link to={`/restaurant/${restaurant._id}`}>
                                                 <Button className="bg-orange hover:bg-hoverOrange font-semibold py-2 px-4 rounded-full shadow-md transition-colors duration-200">
                                                     View Menus
                                                 </Button>

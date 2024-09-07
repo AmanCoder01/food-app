@@ -8,15 +8,17 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from './ui/sheet';
 import { Separator } from './ui/separator';
 import { useUserStore } from '../store/useUserStore';
+import { useCartStore } from '../store/useCartStore';
 
 export const Navbar = () => {
     const { user, logout } = useUserStore();
+    const { cart } = useCartStore();
 
     const navigate = useNavigate();
 
 
     return (
-        <div className='max-w-7xl mx-auto'>
+        <div className='w-full px-3 md:max-w-7xl mx-auto'>
             <div className='flex items-center justify-between h-14'>
                 <Link to="/" className='font-bold md:font-extrabold text-2xl'>HungerHub</Link>
 
@@ -64,19 +66,19 @@ export const Navbar = () => {
 
                         <Link to="/cart" className="relative cursor-pointer">
                             <ShoppingCart />
-                            {true && (
+                            {cart?.length > 0 && (
                                 <Button
                                     size={"icon"}
                                     className="absolute -inset-y-3 left-2 text-xs rounded-full w-4 h-4 bg-red-500 hover:bg-red-500"
                                 >
-                                    {5}
+                                    {cart.length}
                                 </Button>
                             )}
                         </Link>
 
                         <div>
                             <Avatar className='cursor-pointer'>
-                                <AvatarImage />
+                                <AvatarImage src={user?.profilePicture} />
                                 <AvatarFallback>AM</AvatarFallback>
                             </Avatar>
                         </div>
@@ -90,7 +92,7 @@ export const Navbar = () => {
                             ) : (
                                 <Button
                                     className="bg-orange hover:bg-hoverOrange"
-                                    onClick={logout(navigate)}
+                                    onClick={() => logout(navigate)}
                                 >
                                     Logout
                                 </Button>
@@ -111,8 +113,8 @@ export const Navbar = () => {
 
 
 const MobileNavbar = () => {
+    const { user } = useUserStore();
 
-    const admin = true;
 
     return (
         <Sheet>
@@ -165,7 +167,7 @@ const MobileNavbar = () => {
                         <ShoppingCart />
                         <span>Cart (0)</span>
                     </Link>
-                    {admin && (
+                    {user?.role === "admin" && (
                         <>
                             <Link
                                 to="/admin/menu"

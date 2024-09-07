@@ -3,7 +3,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 
 export const Orders = () => {
     return (
-        <div className="max-w-6xl mx-auto py-10 px-6">
+        <div className="w-full px-4 md:max-w-6xl mx-auto py-10">
             <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-10">
                 Orders Overview
             </h1>

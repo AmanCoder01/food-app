@@ -7,7 +7,35 @@ import { toast } from "sonner";
 const API_END_POINT = "http://localhost:8000/api/v1/user"
 axios.defaults.withCredentials = true;
 
-export const useUserStore = create<any>()(persist((set) => ({
+
+type User = {
+    fullname: string;
+    email: string;
+    contact: number;
+    address: string;
+    city: string;
+    country: string;
+    profilePicture: string;
+    admin: boolean;
+    isVerified: boolean;
+}
+
+type UserState = {
+    user: User | null;
+    isAuthenticated: boolean;
+    isCheckingAuth: boolean;
+    loading: boolean;
+    signup: (input: SignupInputState, navigate: any) => Promise<void>;
+    login: (input: LoginInputState, navigate: any) => Promise<void>;
+    verifyEmail: (verificationCode: string, navigate: any) => Promise<void>;
+    checkAuthentication: () => Promise<void>;
+    logout: (navigate: any) => Promise<void>;
+    forgotPassword: (email: string) => Promise<void>;
+    resetPassword: (token: string, password: string, navigate: any) => Promise<void>;
+    updateProfile: (profileData: any) => Promise<void>;
+}
+
+export const useUserStore = create<UserState>()(persist((set) => ({
     user: null,
     isAuthenticated: false,
     isCheckingAuth: false,
@@ -73,8 +101,45 @@ export const useUserStore = create<any>()(persist((set) => ({
             set({ loading: true });
             const response = await axios.post(`${API_END_POINT}/logout`);
             toast.success(response.data.message);
+            localStorage.clear();
             navigate("/login")
             set({ loading: false, user: null, isAuthenticated: false })
+        } catch (error: any) {
+            toast.error(error.response.data.message); set({ loading: false });
+        }
+    },
+    forgotPassword: async (email: string) => {
+        try {
+            set({ loading: true });
+            const response = await axios.post(`${API_END_POINT}/forgot-password`, { email });
+            toast.success(response.data.message);
+            set({ loading: false })
+        } catch (error: any) {
+            toast.error(error.response.data.message);
+            set({ loading: false });
+        }
+    },
+    resetPassword: async (token: string, password: string, navigate: any) => {
+        try {
+            set({ loading: true });
+            const response = await axios.post(`${API_END_POINT}/reset-password/${token}`, { newPassword: password });
+            toast.success(response.data.message);
+            navigate("/login");
+            set({ loading: false })
+        } catch (error: any) {
+            console.log(error);
+
+            toast.error(error.response.data.message);
+            set({ loading: false });
+        }
+    },
+    updateProfile: async (profileData: any) => {
+        try {
+            set({ loading: true });
+            const response = await axios.put(`${API_END_POINT}/profile/update`, profileData);
+
+            toast.success(response.data.message);
+            set({ loading: false, user: response.data.user })
         } catch (error: any) {
             toast.error(error.response.data.message);
             set({ loading: false });

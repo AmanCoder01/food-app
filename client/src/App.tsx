@@ -14,11 +14,17 @@ import { OrderSuccessPage } from './components/OrderSuccessPage'
 import { Restaurant } from './admin/Restaurant'
 import { AddMenu } from './admin/AddMenu'
 import { Orders } from './admin/Orders'
+import { ProtectedRoutes } from './components/ProtectedRoutes'
+import { AuthenticatedUser } from './components/AuthenticatedUser'
+import { AdminRoutes } from './components/AdminRoutes'
+import { useUserStore } from './store/useUserStore'
+import { useEffect } from 'react'
+import { Loading } from './components/Loading'
 
 const appRouter = createBrowserRouter([
   {
     path: "/",
-    element: <MainLayout />,
+    element: <ProtectedRoutes><MainLayout /></ProtectedRoutes>,
     children: [
       {
         path: "/",
@@ -47,32 +53,32 @@ const appRouter = createBrowserRouter([
       // admin
       {
         path: "/admin/restaurant",
-        element: <Restaurant />
+        element: <AdminRoutes><Restaurant /></AdminRoutes>
       },
       {
         path: "/admin/menu",
-        element: <AddMenu />
+        element: <AdminRoutes> <AddMenu /></AdminRoutes>
       },
       {
         path: "/admin/orders",
-        element: <Orders />
+        element: <AdminRoutes> <Orders /></AdminRoutes>
       },
     ]
   },
   {
     path: "/login",
-    element: <Login />
+    element: <AuthenticatedUser><Login /></AuthenticatedUser>
   },
   {
     path: "/signup",
-    element: <Signup />
+    element: <AuthenticatedUser><Signup /></AuthenticatedUser>
   },
   {
     path: "/forgot-password",
-    element: <ForgotPassword />
+    element: <AuthenticatedUser><ForgotPassword /></AuthenticatedUser>
   },
   {
-    path: "/reset-password",
+    path: "/reset-password/:token",
     element: <ResetPassword />
   },
   {
@@ -82,6 +88,15 @@ const appRouter = createBrowserRouter([
 ])
 
 function App() {
+  const { checkAuthentication, isCheckingAuth } = useUserStore();
+
+  // checking auth every time when page is loaded
+  useEffect(() => {
+    checkAuthentication();
+    // initializeTheme();
+  }, [checkAuthentication])
+
+  if (isCheckingAuth) return <Loading />
 
   return (
     <RouterProvider router={appRouter}>

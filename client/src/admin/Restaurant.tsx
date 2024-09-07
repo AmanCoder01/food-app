@@ -2,14 +2,13 @@ import { Loader2 } from "lucide-react"
 import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
 import { Label } from "../components/ui/label"
-import React, { FormEvent, useState } from "react"
+import React, { FormEvent, useEffect, useState } from "react"
 import { restaurantFormSchema, RestaurantFormSchema } from "../schema/restaurantSchema"
+import { useRestaurantStore } from "../store/useRestaurantStore"
 
 export const Restaurant = () => {
-    const loading = false;
 
-
-    const restaurant = true;
+    const { createRestaurant, restaurant, loading, getRestaurant, updateRestaurant } = useRestaurantStore();
 
     const [input, setInput] = useState<RestaurantFormSchema>({
         restaurantName: "",
@@ -38,12 +37,48 @@ export const Restaurant = () => {
             return;
         }
 
-        console.log(input);
 
+        const formData = new FormData();
+        formData.append("restaurantName", input.restaurantName);
+        formData.append("city", input.city);
+        formData.append("country", input.country);
+        formData.append("deliveryTime", input.deliveryTime.toString());
+        formData.append("cuisines", JSON.stringify(input.cuisines));
+
+        if (input.imageFile) {
+            formData.append("imageFile", input.imageFile);
+        }
+
+        if (restaurant) {
+            updateRestaurant(formData);
+        } else {
+            createRestaurant(formData);
+        }
     }
 
+
+    useEffect(() => {
+        const fetchRestaurant = async () => {
+            await getRestaurant();
+            if (restaurant) {
+                setInput({
+                    restaurantName: restaurant.restaurantName || "",
+                    city: restaurant.city || "",
+                    country: restaurant.country || "",
+                    deliveryTime: restaurant.deliveryTime || 0,
+                    cuisines: restaurant.cuisines
+                        ? restaurant.cuisines.map((cuisine: string) => cuisine)
+                        : [],
+                    imageFile: undefined,
+                });
+            };
+        }
+        fetchRestaurant();
+
+    }, []);
+
     return (
-        <div className="max-w-6xl mx-auto my-10">
+        <div className="w-full px-4 md:max-w-6xl mx-auto my-10">
             <div>
                 <h1 className="font-extrabold text-2xl mb-5">Add Restaurants</h1>
 
@@ -137,13 +172,13 @@ export const Restaurant = () => {
                             />
                             {errors && (
                                 <span className="text-xs text-red-600 font-medium">
-                                    {errors.imageFile?.name || "Image file is required"}
+                                    {errors.imageFile?.name}
                                 </span>
                             )}
                         </div>
                     </div>
 
-                    <div className="my-6 w-fit">
+                    <div className="my-3 w-fit">
                         {loading ? (
                             <Button disabled className="bg-orange hover:bg-hoverOrange">
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

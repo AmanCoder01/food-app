@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
+import { useMenuStore } from "../store/useMenuStore";
 
 
 
@@ -32,7 +33,9 @@ export const EditMenu = ({
     });
 
     const [error, setError] = useState<Partial<MenuFormSchema>>({});
-    const loading = false;
+
+
+    const { loading, editMenu } = useMenuStore();
 
     const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type } = e.target;
@@ -49,7 +52,16 @@ export const EditMenu = ({
         }
 
         // api ka kaam start from here
-        console.log(input);
+
+        const formData = new FormData();
+        formData.append("name", input.name);
+        formData.append("description", input.description);
+        formData.append("price", input.price.toString());
+        if (input.image) {
+            formData.append("image", input.image);
+        }
+
+        await editMenu(selectedMenu._id, formData, setEditOpen);
 
     };
 

@@ -6,6 +6,7 @@ import { generateJwtToken } from "../utils/generateJwtToken";
 import { generateVerificationCode } from "../utils/generateVerificationCode";
 import crypto from "crypto";
 import cloudinary from "../utils/cloudinary";
+import uploadImageOnCloudinary from "../utils/imageUpload";
 
 
 export const signup = async (req: Request, res: Response) => {
@@ -185,7 +186,8 @@ export const resetPassword = async (req: Request, res: Response) => {
     try {
         const { token } = req.params;
         const { newPassword } = req.body;
-        const user = await User.findOne({ resetPasswordToken: token, resetPasswordTokenExpiresAt: { $gt: Date.now() } });
+
+        const user = await User.findOne({ resetPasswordToken: token.toString(), resetPasswordTokenExpiresAt: { $gt: Date.now() } });
         if (!user) {
             return res.status(400).json({
                 success: false,
@@ -208,7 +210,7 @@ export const resetPassword = async (req: Request, res: Response) => {
         });
     } catch (error: any) {
         console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: error.message });
     }
 }
 
@@ -233,27 +235,33 @@ export const checkAuth = async (req: Request, res: Response) => {
 };
 
 
-
 export const updateProfile = async (req: Request, res: Response) => {
     try {
         const userId = req.id;
-        const { fullname, email, address, city, country, profilePicture } = req.body;
 
-        // upload image on cloudinary
-        let cloudResponse: any;
-        cloudResponse = await cloudinary.uploader.upload(profilePicture);
+        const { fullname, email, address, city, country } = req.body;
 
-        const updatedData = { fullname, email, address, city, country, profilePicture };
+        const file = req.file;
+
+
+        let imageUrl: any;
+
+        if (file) {
+            imageUrl = await uploadImageOnCloudinary(file as Express.Multer.File);
+        }
+
+        console.log(imageUrl);
+
+        const updatedData = { fullname, email, address, city, country, profilePicture: imageUrl };
 
         const user = await User.findByIdAndUpdate(userId, updatedData, { new: true }).select("-password");
 
         return res.status(200).json({
-            success: true,
             user,
             message: "Profile updated successfully"
         });
     } catch (error: any) {
         console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: error.message });
     }
 }

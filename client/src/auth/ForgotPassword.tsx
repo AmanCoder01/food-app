@@ -3,10 +3,12 @@ import { Input } from '../components/ui/input'
 import { Loader2, Mail } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { Link } from 'react-router-dom'
+import { useUserStore } from '../store/useUserStore'
 
 export const ForgotPassword = () => {
-    const [loading, setLoading] = useState(false);
     const [email, setEmail] = useState<string>("");
+
+    const { forgotPassword, loading } = useUserStore();
 
     return (
         <div className="flex items-center justify-center h-screen">
@@ -31,7 +33,7 @@ export const ForgotPassword = () => {
                     </div>
                     <div className="py-2 w-full ">
                         {loading ? <Button disabled className="bg-orange w-full hover:bg-hoverOrange"><Loader2 className="mr-2 animate-spin h-4 w-4" />Please wait...</Button> :
-                            <Button className="bg-orange w-full hover:bg-hoverOrange">Send Reset Link</Button>
+                            <Button onClick={() => forgotPassword(email)} className="bg-orange w-full hover:bg-hoverOrange">Send Reset Link</Button>
                         }
                     </div>
                     <span>Back to <Link to="/login" className='text-orange hover:underline'>Login</Link></span>

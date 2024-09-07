@@ -8,8 +8,9 @@ import { useUserStore } from "../store/useUserStore";
 
 export const Profile = () => {
     const [selectedProfilePicture, setSelectedProfilePicture] = useState<string>("");
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const { user } = useUserStore();
+
+
 
     const [profileData, setProfileData] = useState({
         fullname: user?.fullname || "",
@@ -20,6 +21,8 @@ export const Profile = () => {
         profilePicture: user?.profilePicture || "",
     });
 
+    const { updateProfile, loading } = useUserStore();
+
 
     const imageRef = useRef(null);
 
@@ -27,15 +30,17 @@ export const Profile = () => {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        setProfileData((prev: any) => ({
+            ...prev,
+            profilePicture: file
+        }))
+
         const reader = new FileReader();
 
         reader.onloadend = () => {
             const result = reader.result as string;
             setSelectedProfilePicture(result);
-            setProfileData((prev) => ({
-                ...prev,
-                profilePicture: result
-            }))
+
         }
 
         reader.readAsDataURL(file);
@@ -51,16 +56,25 @@ export const Profile = () => {
     const updateProfileHandler = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        console.log(profileData);
+
+        const formData = new FormData();
+        formData.append('profilePicture', profileData.profilePicture);
+        formData.append('fullname', profileData.fullname);
+        formData.append('email', profileData.email);
+        formData.append('address', profileData.address);
+        formData.append('city', profileData.city);
+        formData.append('country', profileData.country);
+
+        updateProfile(formData);
 
     }
 
     return (
-        <form className="max-w-7xl mx-auto my-5" onSubmit={updateProfileHandler}>
+        <form className="w-full px-4 md:max-w-7xl mx-auto my-5" onSubmit={updateProfileHandler}>
             <div className="flex items-center">
                 <div className="flex items-center gap-2">
                     <Avatar className="relative w-20 h-20 md:w-28 md:h-28">
-                        <AvatarImage src={selectedProfilePicture} />
+                        <AvatarImage src={selectedProfilePicture ? selectedProfilePicture : profileData?.profilePicture} />
                         <AvatarFallback>AM</AvatarFallback>
 
                         <input ref={imageRef} type="file" className="hidden" accept="image/*"
@@ -141,7 +155,7 @@ export const Profile = () => {
             </div>
 
             <div className="text-center">
-                {isLoading ? (
+                {loading ? (
                     <Button disabled className="bg-orange hover:bg-hoverOrange">
                         <Loader2 className="mr-2 w-4 h-4 animate-spin" />
                         Please wait
