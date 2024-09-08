@@ -116,7 +116,7 @@ export const getRestaurantOrder = async (req: Request, res: Response) => {
             })
         };
 
-        const orders = await Order.find({ restaurant: restaurant._id }).populate('restaurant').populate('user');
+        const orders = await Order.find({ restaurant: restaurant._id }).sort({ createdAt: -1 });
 
         return res.status(200).json({
             success: true,

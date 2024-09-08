@@ -59,11 +59,10 @@ export const AddMenu = () => {
                 </h1>
 
                 <Dialog open={open} onOpenChange={setOpen}>
-                    <DialogTrigger>
-                        <Button className="bg-orange hover:bg-hoverOrange">
-                            <Plus className="mr-2" />
-                            Add Menus
-                        </Button>
+                    <DialogTrigger className="bg-orange hover:bg-hoverOrange flex items-center p-2 rounded-lg text-white">
+
+                        <Plus className="mr-2" />
+                        Add Menus
                     </DialogTrigger>
 
                     <DialogContent>

@@ -1,4 +1,3 @@
-import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from './ui/menubar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
@@ -9,10 +8,12 @@ import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHe
 import { Separator } from './ui/separator';
 import { useUserStore } from '../store/useUserStore';
 import { useCartStore } from '../store/useCartStore';
+import { useThemeStore } from '../store/useThemeStore';
 
 export const Navbar = () => {
     const { user, logout } = useUserStore();
     const { cart } = useCartStore();
+    const { setTheme } = useThemeStore();
 
     const navigate = useNavigate();
 
@@ -58,8 +59,8 @@ export const Navbar = () => {
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                    <DropdownMenuItem >Light</DropdownMenuItem>
-                                    <DropdownMenuItem >Dark</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setTheme('light')}>Light</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setTheme('dark')}>Dark</DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu >
                         </div >
@@ -115,6 +116,7 @@ export const Navbar = () => {
 const MobileNavbar = () => {
     const { user } = useUserStore();
 
+    const { setTheme } = useThemeStore();
 
     return (
         <Sheet>
@@ -139,8 +141,8 @@ const MobileNavbar = () => {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem >Light</DropdownMenuItem>
-                            <DropdownMenuItem >Dark</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setTheme('light')}>Light</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setTheme('dark')}>Dark</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </SheetHeader>

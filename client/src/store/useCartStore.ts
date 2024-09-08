@@ -24,7 +24,7 @@ export const useCartStore = create<any>()(persist((set) => ({
     },
     removeFromTheCart: (id: string) => {
         set((state: any) => ({
-            cart: state.cart.map((cartItem: any) => cartItem._id !== id)
+            cart: state.cart.filter((cartItem: any) => cartItem._id !== id)
         }))
     },
     incrementQuantity: (id: string) => {

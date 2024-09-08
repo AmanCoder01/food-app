@@ -1,23 +1,33 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, FormEvent, SetStateAction, useState } from "react";
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from "./ui/dialog";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { Button } from "./ui/button";
 import { Loader2 } from "lucide-react";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
+import { useUserStore } from "../store/useUserStore";
+import { useCartStore } from "../store/useCartStore";
+import { useRestaurantStore } from "../store/useRestaurantStore";
+import { useOrderStore } from "../store/useOrderStore";
 
 export const CheckoutConfirmPage = ({ open, setOpen }: {
     open: boolean;
     setOpen: Dispatch<SetStateAction<boolean>>;
 }) => {
 
+    const { user } = useUserStore();
+    const { cart } = useCartStore();
+    const { restaurant } = useRestaurantStore();
+    const { createCheckoutSession, loading } = useOrderStore();
+
+
     const [input, setInput] = useState({
-        name: "",
-        email: "",
-        contact: "",
-        address: "",
-        city: "",
-        country: "",
+        name: user?.fullname || "",
+        email: user?.email || "",
+        contact: user?.contact || "",
+        address: user?.address || "",
+        city: user?.city || "",
+        country: user?.country || "",
     });
 
 
@@ -26,8 +36,27 @@ export const CheckoutConfirmPage = ({ open, setOpen }: {
         setInput({ ...input, [name]: value });
     };
 
-    const checkoutHandler = () => {
+    const checkoutHandler = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
 
+        try {
+            const checkoutData = {
+                cartItems: cart.map((cartItem: any) => ({
+                    menuId: cartItem._id,
+                    name: cartItem.name,
+                    image: cartItem.image,
+                    price: cartItem.price,
+                    quantity: cartItem.quantity
+                })),
+                deliveryDetails: input,
+                restaurantId: restaurant?._id as string
+            }
+
+            await createCheckoutSession(checkoutData);
+        } catch (error) {
+            console.log(error);
+
+        }
     }
 
     return (
@@ -99,7 +128,7 @@ export const CheckoutConfirmPage = ({ open, setOpen }: {
                         />
                     </div>
                     <DialogFooter className="col-span-2 pt-5">
-                        {false ? (
+                        {loading ? (
                             <Button disabled className="bg-orange hover:bg-hoverOrange">
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                 Please wait
