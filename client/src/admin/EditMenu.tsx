@@ -21,11 +21,12 @@ export const EditMenu = ({
     editOpen,
     setEditOpen,
 }: {
-    selectedMenu: MenuFormSchema
+    selectedMenu: any
     editOpen: boolean;
     setEditOpen: Dispatch<SetStateAction<boolean>>;
 }) => {
     const [input, setInput] = useState<MenuFormSchema>({
+
         name: "",
         description: "",
         price: 0,

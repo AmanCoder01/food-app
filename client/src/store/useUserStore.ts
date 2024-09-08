@@ -18,6 +18,7 @@ type User = {
     profilePicture: string;
     admin: boolean;
     isVerified: boolean;
+    role?: string
 }
 
 type UserState = {

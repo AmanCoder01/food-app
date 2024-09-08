@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const menuFormSchema = z.object({
+
     name: z.string().nonempty({ message: "Name is required" }),
     description: z.string().nonempty({ message: "Description is required" }),
     price: z.number().min(0, { message: "Price can not be negative" }),

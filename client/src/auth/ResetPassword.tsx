@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Input } from '../components/ui/input'
-import { Loader2, Lock, Mail } from 'lucide-react'
+import { Loader2, Lock } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useUserStore } from '../store/useUserStore'
@@ -38,7 +38,7 @@ export const ResetPassword = () => {
                     <div className="py-2 w-full ">
                         {loading ? <Button disabled className="bg-orange w-full hover:bg-hoverOrange"><Loader2 className="mr-2 animate-spin h-4 w-4" />Please wait...</Button> :
                             <Button onClick={() =>
-                                resetPassword(password, token, navigate)
+                                resetPassword(password, token!, navigate)
                             } className="bg-orange w-full hover:bg-hoverOrange">Reset </Button>
                         }
                     </div>

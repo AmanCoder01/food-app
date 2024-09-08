@@ -24,7 +24,7 @@ export const Profile = () => {
     const { updateProfile, loading } = useUserStore();
 
 
-    const imageRef = useRef(null);
+    const imageRef: any = useRef(null);
 
     const fileChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

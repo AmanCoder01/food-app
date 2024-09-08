@@ -135,7 +135,7 @@ export const useRestaurantStore = create<any>()(persist((set, get) => ({
                 }
             });
             if (response.data.success) {
-                const updatedOrder = get().restaurantOrder.map((order: Orders) => {
+                const updatedOrder = get().restaurantOrder.map((order: any) => {
                     return order._id === orderId ? { ...order, status: response.data.status } : order;
                 })
                 set({ restaurantOrder: updatedOrder });

@@ -11,7 +11,7 @@ export const Cart = () => {
 
     const { clearCart, cart, removeFromTheCart, incrementQuantity, decrementQuantity } = useCartStore();
 
-    let totalAmount = cart.reduce((acc, ele) => {
+    let totalAmount = cart.reduce((acc: any, ele: any) => {
         return acc + ele.price * ele.quantity;
     }, 0);
 
